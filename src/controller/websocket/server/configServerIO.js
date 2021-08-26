@@ -2,6 +2,7 @@ const CheckMessage = require("../../functions/index");
 
 exports.WebsocketIOLibs = (DP) =>{
 
+    //Disponibilizar o arquivo index para solicitações via Browser
     const IndexHTMLServer = (INDEX = __basedir+"/src/pages/main/index.html") =>{
 
         DP.app.get('/', (req, res) => {
@@ -10,6 +11,7 @@ exports.WebsocketIOLibs = (DP) =>{
 
     }
 
+    //Configuração do serviço SocketIO. Essa função poderá ser implementada fora função desse arquivo
     const ConfigIOServer = ()=>{
 
         DP.io.on('connection', (socket) => {
@@ -46,6 +48,7 @@ exports.WebsocketIOLibs = (DP) =>{
 
     }
 
+    //Função de inicialização de toodo serviço pela porta padrão.
     const InitialServerStart = (PORT = 3000) =>{
 
 
