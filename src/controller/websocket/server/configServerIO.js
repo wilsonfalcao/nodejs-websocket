@@ -1,3 +1,5 @@
+const CheckMessage = require("../../functions/index");
+
 exports.WebsocketIOLibs = (DP) =>{
 
     const IndexHTMLServer = (INDEX = __basedir+"/src/pages/main/index.html") =>{
@@ -12,17 +14,34 @@ exports.WebsocketIOLibs = (DP) =>{
 
         DP.io.on('connection', (socket) => {
             
-            console.log('a user connected');
+            //Informando nova entrada a todos
+            console.log('new user joined');
+
+            DP.io.emit('user-connected', `.:New user joined the chat:. User ID -> ${socket.id}` );
+
+            DP.io.sockets.in(socket.id).emit('user-connected',`Welcome to Realtime Chat, 
+            you are the user number ${Date.now("")}. We're quite glad to see you here, please get look our
+            chat`);
         
-            //get guest
+            //Informando desconexão
             socket.on('disconnect', () => {
-                console.log('user disconnected');
+                console.log('the guest was disconneted');
+                DP.io.emit('user-disconnected', `.:The user (${socket.id}) has disconnected from the chat:.`);
             });
         
             //listening messages from server
-            socket.on('chat message', (msg) => {
-                DP.io.emit('chat message', msg);
-              });
+            socket.on('chat-message', (msg) => {
+
+                const [messageModified,status] =  CheckMessage(msg,socket.id);
+
+                if(status){
+                    DP.io.sockets.in(messageModified.to).emit('chat-message',messageModified);
+                    DP.io.sockets.in(socket.id).emit('chat-message',messageModified);
+                }else{
+                    DP.io.emit('chat-message', msg);
+                }
+            });
+
         });
 
     }

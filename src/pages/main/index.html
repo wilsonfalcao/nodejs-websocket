@@ -12,6 +12,8 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+      .join-user {color: rgb(33, 114, 1);}
+      .disconnected-user {color: rgba(252, 4, 4);}
     </style>
   </head>
   <body>
@@ -29,18 +31,42 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       if (input.value) {
-        socket.emit('chat message', input.value);
+        socket.emit('chat-message', {
+          profile:"https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+          body:input.value,
+          date:Date.now(),
+          msgid:"",
+          to:"server",
+          from:"",
+          state:"false",
+        });
         input.value = '';
       }
     });
 
-    socket.on('chat message', function(msg) {
+    socket.on('chat-message', function(_item) {
       var item = document.createElement('li');
+      item.textContent = `${_item.from} diz para ${_item.to}: ${_item.body}`;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+      console.log(_item);
+    });
+
+    socket.on('user-connected', (msg) => {
+      var item = document.createElement('li');
+      item.className = "join-user";
       item.textContent = msg;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     });
 
+    socket.on('user-disconnected', (msg) => {
+      var item = document.createElement('li');
+      item.className = "disconnected-user";
+      item.textContent = msg;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
     
   </script>
 </html>
